@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#071b35" />
+  <title>MBEMBE PAY</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#"><span class="brand-mark">M</span> MBEMBE <b>PAY</b></a>
+    <button id="signOutBtn" class="text-button hidden">Sign out</button>
+  </header>
+  <main>
+    <section id="authPanel" class="auth-layout">
+      <div class="hero">
+        <p class="eyebrow">ONE PLATFORM. EVERYDAY PAYMENTS.</p>
+        <h1>Your money.<br><span>Your move.</span></h1>
+        <p class="hero-copy">A simple home for wallet tools, transfers, airtime, data and bill payments.</p>
+        <div class="feature-row"><span>Wallet</span><span>Transfers</span><span>Airtime & data</span><span>Bills</span></div>
+      </div>
+      <div class="card auth-card">
+        <div class="tabs"><button class="tab active" data-mode="signin">Sign in</button><button class="tab" data-mode="signup">Create account</button></div>
+        <h2 id="authTitle">Welcome back</h2>
+        <p class="muted" id="authSubtitle">Sign in to your MBEMBE PAY account.</p>
+        <form id="authForm">
+          <label>Email address<input id="email" type="email" autocomplete="email" required placeholder="you@example.com"></label>
+          <label>Password<input id="password" type="password" autocomplete="current-password" minlength="6" required placeholder="At least 6 characters"></label>
+          <button id="authSubmit" class="primary full" type="submit">Sign in</button>
+        </form>
+        <p id="authMessage" class="message" role="status"></p>
+        <p class="tiny">Demo starter only. No real money movement is enabled.</p>
+      </div>
+    </section>
+
+    <section id="dashboard" class="hidden">
+      <div class="welcome">
+        <div><p class="eyebrow">YOUR PAYMENT SPACE</p><h1>Welcome to <span>MBEMBE PAY</span></h1><p class="muted" id="userEmail"></p></div>
+        <div class="status-pill"><i></i> Account signed in</div>
+      </div>
+      <div class="notice"><b>Starter dashboard</b><br>Wallet balances and transactions are placeholders until a secure backend and licensed payment provider are configured.</div>
+      <div class="grid">
+        <article class="tile balance"><p>Wallet balance</p><h2>₦ — — —</h2><span>Connect a verified payment provider to enable balances.</span></article>
+        <article class="tile"><div class="tile-icon">↗</div><h3>Transfer money</h3><p>Transfer flow placeholder</p><button class="secondary demoAction" data-action="Transfers">Explore</button></article>
+        <article class="tile"><div class="tile-icon">▤</div><h3>Buy airtime</h3><p>Mobile top-up placeholder</p><button class="secondary demoAction" data-action="Airtime">Explore</button></article>
+        <article class="tile"><div class="tile-icon">▥</div><h3>Buy data</h3><p>Data bundle placeholder</p><button class="secondary demoAction" data-action="Data">Explore</button></article>
+        <article class="tile"><div class="tile-icon">⌁</div><h3>Pay bills</h3><p>Electricity and other bills placeholder</p><button class="secondary demoAction" data-action="Bill payments">Explore</button></article>
+        <article class="tile"><div class="tile-icon">◷</div><h3>Transactions</h3><p>Your transaction history will appear here.</p><button class="secondary demoAction" data-action="Transaction history">View</button></article>
+      </div>
+      <p id="dashboardMessage" class="message"></p>
+    </section>
+  </main>
+  <footer>© <span id="year"></span> MBEMBE PAY · Built for everyday payments</footer>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
