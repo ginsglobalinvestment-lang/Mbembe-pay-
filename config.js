@@ -1,3 +1,5 @@
 // MBEMBE PAY - Supabase Configuration
 
-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF3aWFjYWJhYnR1c3lpaHhscmxiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI0Nzg5MzMsImV4cCI6MjEwODA1NDkzM30.YufnQWgQNBWOxd289pXQzTARfXvPL1_uhCcgSgQ3iK4
+const SUPABASE_URL = "https://qwiacababtusyihxlrlb.supabase.co";
+
+const SUPABASE_ANON_KEY = "PASTE_YOUR_EXISTING_PUBLISHABLE_OR_ANON_KEY_HERE";
