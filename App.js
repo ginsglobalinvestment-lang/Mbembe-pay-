@@ -190,3 +190,4 @@ updatePage();
 
 updatePage();
 });
+alert("MBEMBE PAY JavaScript is working!");
