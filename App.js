@@ -1,114 +1,192 @@
 // MBEMBE PAY - Application Logic
 
 document.addEventListener("DOMContentLoaded", () => {
-  const signupForm = document.getElementById("signup-form");
-  const loginForm = document.getElementById("login-form");
-  const logoutButton = document.getElementById("logout-button");
-  const message = document.getElementById("auth-message");
+const authPanel = document.getElementById("authPanel");
+const dashboard = document.getElementById("dashboard");
+const authForm = document.getElementById("authForm");
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
+const authSubmit = document.getElementById("authSubmit");
+const authTitle = document.getElementById("authTitle");
+const authSubtitle = document.getElementById("authSubtitle");
+const authMessage = document.getElementById("authMessage");
+const signOutBtn = document.getElementById("signOutBtn");
+const userEmail = document.getElementById("userEmail");
+const dashboardMessage = document.getElementById("dashboardMessage");
+const tabs = document.querySelectorAll(".tab");
+const demoButtons = document.querySelectorAll(".demoAction");
 
-  function showMessage(text) {
-    if (message) message.textContent = text;
-  }
+let mode = "signin";
+let client;
 
-  // Check that the Supabase library and configuration exist.
-  if (
-    typeof window.supabase === "undefined" ||
-    typeof SUPABASE_URL === "undefined" ||
-    typeof SUPABASE_ANON_KEY === "undefined" ||
-    SUPABASE_URL.startsWith("YOUR_") ||
-    SUPABASE_ANON_KEY.startsWith("YOUR_")
-  ) {
-    showMessage(
-      "Setup required: connect your Supabase project before using authentication."
-    );
-    return;
-  }
+document.getElementById("year").textContent =
+new Date().getFullYear();
 
-  const client = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-  );
+function showAuthMessage(text) {
+if (authMessage) authMessage.textContent = text;
+}
 
-  if (signupForm) {
-    signupForm.addEventListener("submit", async (event) => {
-      event.preventDefault();
+function showDashboardMessage(text) {
+if (dashboardMessage) dashboardMessage.textContent = text;
+}
 
-      const email = signupForm.querySelector('[name="email"]')?.value.trim();
-      const password = signupForm.querySelector('[name="password"]')?.value;
+function setMode(newMode) {
+mode = newMode;
 
-      if (!email || !password) {
-        showMessage("Please enter your email and password.");
-        return;
-      }
+tabs.forEach((tab) => {
+  tab.classList.toggle("active", tab.dataset.mode === mode);
+});
 
-      if (password.length < 8) {
-        showMessage("Your password must contain at least 8 characters.");
-        return;
-      }
+authTitle.textContent =
+  mode === "signin" ? "Welcome back" : "Create your account";
 
-      showMessage("Creating your account...");
+authSubtitle.textContent =
+  mode === "signin"
+    ? "Sign in to your MBEMBE PAY account."
+    : "Register for your MBEMBE PAY account.";
 
-      const { error } = await client.auth.signUp({
-        email,
-        password
-      });
+authSubmit.textContent =
+  mode === "signin" ? "Sign in" : "Create account";
 
-      if (error) {
-        showMessage(error.message);
-        return;
-      }
+passwordInput.autocomplete =
+  mode === "signin" ? "current-password" : "new-password";
 
-      showMessage(
-        "Registration submitted. Check your email if confirmation is required."
+showAuthMessage("");
+
+}
+
+tabs.forEach((tab) => {
+tab.addEventListener("click", () => setMode(tab.dataset.mode));
+});
+
+if (
+!window.supabase ||
+typeof SUPABASE_URL === "undefined" ||
+typeof SUPABASE_ANON_KEY === "undefined" ||
+!SUPABASE_URL ||
+!SUPABASE_ANON_KEY
+) {
+showAuthMessage(
+"Setup error: check config.js and your Supabase configuration."
+);
+return;
+}
+
+client = window.supabase.createClient(
+SUPABASE_URL,
+SUPABASE_ANON_KEY
+);
+
+async function updatePage() {
+const { data, error } = await client.auth.getSession();
+
+if (error) {
+  showAuthMessage("Could not check your session: " + error.message);
+  return;
+}
+
+const session = data.session;
+
+if (session) {
+  authPanel.classList.add("hidden");
+  dashboard.classList.remove("hidden");
+  signOutBtn.classList.remove("hidden");
+  userEmail.textContent = session.user.email || "";
+} else {
+  authPanel.classList.remove("hidden");
+  dashboard.classList.add("hidden");
+  signOutBtn.classList.add("hidden");
+}
+
+}
+
+authForm.addEventListener("submit", async (event) => {
+event.preventDefault();
+
+const email = emailInput.value.trim();
+const password = passwordInput.value;
+
+if (!email || !password) {
+  showAuthMessage("Please enter your email and password.");
+  return;
+}
+
+if (password.length < 6) {
+  showAuthMessage("Your password must contain at least 6 characters.");
+  return;
+}
+
+authSubmit.disabled = true;
+
+try {
+  if (mode === "signup") {
+    showAuthMessage("Creating your account...");
+
+    const { data, error } = await client.auth.signUp({
+      email,
+      password
+    });
+
+    if (error) throw error;
+
+    if (data.session) {
+      showAuthMessage("Account created successfully!");
+      await updatePage();
+    } else {
+      showAuthMessage(
+        "Registration submitted. Check your email to confirm your account if required."
       );
+    }
+  } else {
+    showAuthMessage("Signing in...");
+
+    const { error } = await client.auth.signInWithPassword({
+      email,
+      password
     });
+
+    if (error) throw error;
+
+    showAuthMessage("Login successful!");
+    await updatePage();
   }
+} catch (error) {
+  showAuthMessage(error.message || "Something went wrong.");
+} finally {
+  authSubmit.disabled = false;
+}
 
-  if (loginForm) {
-    loginForm.addEventListener("submit", async (event) => {
-      event.preventDefault();
+});
 
-      const email = loginForm.querySelector('[name="email"]')?.value.trim();
-      const password = loginForm.querySelector('[name="password"]')?.value;
+signOutBtn.addEventListener("click", async () => {
+signOutBtn.disabled = true;
 
-      if (!email || !password) {
-        showMessage("Please enter your email and password.");
-        return;
-      }
+const { error } = await client.auth.signOut();
 
-      showMessage("Signing in...");
+signOutBtn.disabled = false;
 
-      const { error } = await client.auth.signInWithPassword({
-        email,
-        password
-      });
+if (error) {
+  showAuthMessage("Sign-out failed: " + error.message);
+  return;
+}
 
-      if (error) {
-        showMessage("Login failed: " + error.message);
-        return;
-      }
+showAuthMessage("You have signed out.");
+await updatePage();
 
-      showMessage("Login successful!");
+});
 
-      // Refresh the page so the dashboard can display the session.
-      window.location.reload();
-    });
-  }
+demoButtons.forEach((button) => {
+button.addEventListener("click", () => {
+showDashboardMessage(
+button.dataset.action +
+" is not enabled yet. This is a starter demo."
+);
+});
+});
 
-  if (logoutButton) {
-    logoutButton.addEventListener("click", async () => {
-      const { error } = await client.auth.signOut();
+client.auth.onAuthStateChange(() => {
+updatePage();
+});
 
-      if (error) {
-        showMessage("Logout failed: " + error.message);
-        return;
-      }
-
-      window.location.reload();
-    });
-  }
-
-  client.auth.onAuthStateChange((_event, session) => {
-    document.body.dataset.authenticated = session ? "true" : "false";
-  });
+updatePage();
 });
